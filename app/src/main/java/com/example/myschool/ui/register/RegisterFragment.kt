@@ -26,8 +26,6 @@ import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import com.example.myschool.MySchoolApplication
 import com.example.myschool.R
 import com.example.myschool.databinding.FragmentRegisterBinding
@@ -47,10 +45,10 @@ class RegisterFragment : Fragment() {
 
     private val takePhoto = 1
     private val fromAlbum = 2
-    private lateinit var account: String
     private lateinit var headPortraitUri: Uri
     private lateinit var headPortrait: File
     private lateinit var headPortraitPath: String
+    private var isGetHeadPortraitPath:Boolean=false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,23 +93,23 @@ class RegisterFragment : Fragment() {
         }
 
         binding.confirmBtn.setOnClickListener {
-            account = binding.registerAccountEdit.text.toString()
+            val account:String = binding.registerAccountEdit.text.toString()
             val password: String = binding.registerPasswordEdit.text.toString()
             val userName: String = binding.registerNameEdit.text.toString()
-            if (account.length in 6..10 && password.length in 8..15 && userName.isNotEmpty()) {
+            if (account.length in 6..10 && password.length in 8..15 && userName.isNotEmpty()&&isGetHeadPortraitPath) {
                 thread {
                     val user: User? = userDao.loadUser(account)
                     if (user == null) {
                         val newUser = User(
                             account, password, userName,
-                            userStatic = true,
+                            userStatus = true,
                             isLogged = false,
                             headPortraitPath
                         )
                         newUser.id = userDao.insertUser(newUser)
                         val intent = Intent(context, LoginActivity::class.java).apply {
                             putExtra("registerAccount", account)
-                            putExtra("STATIC", "REGISTER")
+                            putExtra("STATUS", "REGISTER")
                         }
                         startActivity(intent)
                         activity?.finish() //跳转后，销毁返回键的日志
@@ -296,10 +294,12 @@ class RegisterFragment : Fragment() {
 
     /*通过图片路径显示图片*/
     private fun displayImage(imagePath: String?) {
-        if (!TextUtils.isEmpty(imagePath))
-        //显示图片
+        if (!TextUtils.isEmpty(imagePath)) {
+            //显示图片
             Glide.with(this).load(imagePath).apply(MySchoolApplication.requestOptions)
                 .into(binding.userHeadPortraitSetter)
+            isGetHeadPortraitPath=true
+        }
         else
             Toast.makeText(
                 MySchoolApplication.context, "Failed to get image!",

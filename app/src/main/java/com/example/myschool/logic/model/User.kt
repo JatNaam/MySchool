@@ -10,7 +10,7 @@ data class User(
     var userAccount: String,
     var userPassword: String,
     var userName: String,
-    var userStatic: Boolean,
+    var userStatus: Boolean,
     var isLogged: Boolean,
     var userHeadPortraitPath: String
 ):Serializable //序列化之后可以利用Intent传递对象数据

@@ -22,7 +22,7 @@ open class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val intentFilter = IntentFilter()
-        intentFilter.addAction("com.example.myschool.FORCE_OFFLINE")
+        intentFilter.addAction("com.example.myschool.Force_Offline")
         receiver = ForceOfflineReceiver() //创建广播接受器对象
         registerReceiver(receiver, intentFilter) //动态注册广播接收器
     }
@@ -45,14 +45,11 @@ open class BaseActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) { //这个intent接受广播传输的数据
             AlertDialog.Builder(context).apply {
                 setTitle("Warning")
-                setMessage("You are forced to be offline. Please try to login again.")
+                setMessage("You are forced to offline. Please try to login again.")
                 setCancelable(false)
                 setPositiveButton("OK") { _, _ ->
                     finishAll() // 销毁所有活动
-                    val account = intent.getStringExtra("currentAccount")
                     val intent1 = Intent(context, LoginActivity::class.java)
-                    intent1.putExtra("preAccount", account)
-                    intent1.putExtra("STATIC", "LOGGED")
                     context.startActivity(intent1) // 重新启动LoginActivity
                 }
                 show()

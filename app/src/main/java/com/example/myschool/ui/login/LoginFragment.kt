@@ -20,6 +20,7 @@ import com.example.myschool.databinding.FragmentLoginBinding
 import com.example.myschool.logic.AppDatabase
 import com.example.myschool.logic.dao.UserDao
 import com.example.myschool.logic.model.User
+import com.example.myschool.network.NetWorkUtil
 import com.example.myschool.ui.register.RegisterActivity
 import kotlin.concurrent.thread
 
@@ -54,8 +55,8 @@ class LoginFragment : Fragment() {
                             Glide.with(this).load(user.userHeadPortraitPath)
                                 .apply(MySchoolApplication.requestOptions)
                                 .into(binding.userHeadPortrait)
-                            binding.rememberCheck.isChecked = user.userStatic
-                            if (user.userStatic) {
+                            binding.rememberCheck.isChecked = user.userStatus
+                            if (user.userStatus) {
                                 binding.loginPasswordEdit.setText(user.userPassword)
                             } else binding.loginPasswordEdit.text = null
                         }
@@ -76,16 +77,11 @@ class LoginFragment : Fragment() {
         /*判断是在什么情况打开登录界面的*/
         var intent = activity?.intent
         if (intent != null) {
-            when (intent.getStringExtra("STATIC")) {
+            when (intent.getStringExtra("STATUS")) {
                 null -> {
-                    /*重新打开程序*/
+                    /*重新打开程序、填上上一个登录的账号*/
                     val loggedAccountBefore: String? = sp.getString("loggedAccountBefore", null)
                     binding.loginAccountEdit.setText(loggedAccountBefore)
-                }
-                "LOGGED" -> {
-                    //填上上一个被下线的账号
-                    val preAccount = intent.getStringExtra("preAccount")
-                    binding.loginAccountEdit.setText(preAccount)
                 }
                 "REGISTER" -> {
                     //填上刚刚注册完成的账号
@@ -98,58 +94,72 @@ class LoginFragment : Fragment() {
         binding.loginBtn.setOnClickListener {
             val account: String = binding.loginAccountEdit.text.toString()
             val password: String = binding.loginPasswordEdit.text.toString()
-            if (account.length in 6..10 && password.length in 8..15) {
-                thread {
-                    val user: User? = userDao.loadUser(account)
-                    if (user != null) {
-                        if (user.userPassword == password) {
-                            user.userStatic = binding.rememberCheck.isChecked
-                            user.isLogged = true
-                            userDao.updateUser(user)
-                            /*利用intent传递序列化之后的对象数据*/
-                            intent = Intent(context, MainActivity::class.java).apply {
-                                putExtra("userData", user)
-                            }
-                            /*保存登录的账号，用于重新打开程序时填写信息*/
-                            /*重新更新users的数据*/
-                            @SuppressLint("CommitPrefEdits") val editor = sp.edit()
-                            editor.putString("loggedAccountBefore", account)
-                            editor.apply()
+            if (NetWorkUtil.isNetworkConnected(MySchoolApplication.context)){
+                if (account.length in 6..10 && password.length in 8..15) {
+                    thread {
+                        val user: User? = userDao.loadUser(account)
+                        if (user != null) {
+                            if (user.userPassword == password) {
+                                user.userStatus = binding.rememberCheck.isChecked
+                                user.isLogged = true
+                                userDao.updateUser(user)
+                                /*利用intent传递序列化之后的对象数据*/
+                                intent = Intent(context, MainActivity::class.java).apply {
+                                    putExtra("userData", user)
+                                }
+                                /*保存登录的账号，用于重新打开程序时填写信息*/
+                                /*重新更新users的数据*/
+                                @SuppressLint("CommitPrefEdits") val editor = sp.edit()
+                                editor.putString("loggedAccountBefore", account)
+                                editor.apply()
 
-                            startActivity(intent)
-                            activity?.finish() //跳转后，销毁返回键的日志
+                                startActivity(intent)
+                                activity?.finish() //跳转后，销毁返回键的日志
+                            } else {
+                                activity?.runOnUiThread {
+                                    Toast.makeText(
+                                        MySchoolApplication.context, "Password error!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    binding.loginPasswordEdit.text = null
+                                }
+                            }
                         } else {
                             activity?.runOnUiThread {
                                 Toast.makeText(
-                                    MySchoolApplication.context, "Password error!",
+                                    MySchoolApplication.context, "This account is not exist!",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                binding.loginAccountEdit.text = null
                                 binding.loginPasswordEdit.text = null
                             }
                         }
-                    } else {
-                        activity?.runOnUiThread {
-                            Toast.makeText(
-                                MySchoolApplication.context, "This account is not exist!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            binding.loginAccountEdit.text = null
-                            binding.loginPasswordEdit.text = null
-                        }
                     }
+                } else {
+                    Toast.makeText(
+                        MySchoolApplication.context, "Input error!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 Toast.makeText(
-                    MySchoolApplication.context, "Input error!",
+                    MySchoolApplication.context, "Please check your network status!",
                     Toast.LENGTH_SHORT
                 ).show()
             }
         }
 
         binding.registerBtn.setOnClickListener {
-            intent = Intent(context, RegisterActivity::class.java)
-            startActivity(intent)
-            activity?.finish()
+            if (NetWorkUtil.isNetworkConnected(MySchoolApplication.context)){
+                intent = Intent(context, RegisterActivity::class.java)
+                startActivity(intent)
+                activity?.finish()
+            } else {
+                Toast.makeText(
+                    MySchoolApplication.context, "Please check your network status!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
         binding.showListBtn.setOnClickListener { showPopupWindow() }

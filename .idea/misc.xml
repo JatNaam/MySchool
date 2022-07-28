@@ -3,19 +3,37 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/drawable-xhdpi/underline.xml" value="0.235" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout-sw600dp/activity_login.xml" value="0.1" />
-        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout-sw600dp/activity_main.xml" value="0.17827868852459017" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout-sw600dp/activity_main.xml" value="0.1" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout-v23/dialog_bottom_register.xml" value="0.19837537409149208" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/account_item.xml" value="0.19837537409149208" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/activity_life.xml" value="0.19752030782385635" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/activity_login.xml" value="0.1" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/activity_register.xml" value="0.19837537409149208" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/activity_study.xml" value="0.1" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/dialog_bottom.xml" value="0.19837537409149208" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/dialog_bottom_register.xml" value="0.1" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/fragment_home.xml" value="0.1" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/fragment_life.xml" value="0.19752030782385635" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/fragment_login.xml" value="0.1" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/fragment_register.xml" value="0.1" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/fragment_study.xml" value="0.18046875" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/fragment_viewpager.xml" value="0.1" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/item_notice.xml" value="0.19837537409149208" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/item_transacion_right.xml" value="0.19752030782385635" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/item_transaction_left.xml" value="0.1" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/item_transaction_right.xml" value="0.1" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/login_frag.xml" value="0.1" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/nav_header.xml" value="0.25" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/notice_item.xml" value="0.19752030782385635" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/popupwindow.xml" value="0.19837537409149208" />
         <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/popupwindow_accounts.xml" value="0.1" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/layout/transaction_item.xml" value="0.19837537409149208" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/menu/nav_menu.xml" value="0.19837537409149208" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/menu/toolbar.xml" value="0.19837537409149208" />
+        <entry key="..\:/CodePorject/AndroidProject/MySchool/app/src/main/res/xml/array.xml" value="0.19752030782385635" />
       </map>
     </option>
   </component>

@@ -22,6 +22,8 @@
         android:theme="@style/Theme.MySchool">
         <activity android:name=".MainActivity"/>
         <activity android:name=".ui.register.RegisterActivity"/>
+        <activity android:name=".ui.function.LifeActivity"/>
+        <activity android:name=".ui.function.StudyActivity"/>
         <activity android:name=".ui.login.LoginActivity"
             android:exported="true">
             <intent-filter>

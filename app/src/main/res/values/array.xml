@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="selected_item">Selected item:</string>
+    <string-array name="s_list">
+        <item>阅览用户</item>
+        <item>1.党委办公室</item>
+        <item>2.档案馆</item>
+        <item>3.组织部</item>
+    </string-array>
+</resources>

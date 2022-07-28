@@ -45,7 +45,7 @@ open class BaseActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) { //这个intent接受广播传输的数据
             AlertDialog.Builder(context).apply {
                 setTitle("Warning")
-                setMessage("You are forced to offline. Please try to login again.")
+                setMessage("Log out.")
                 setCancelable(false)
                 setPositiveButton("OK") { _, _ ->
                     finishAll() // 销毁所有活动

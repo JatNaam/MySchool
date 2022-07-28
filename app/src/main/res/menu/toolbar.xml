@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--app命名空间：为了兼容低版本的系统
+        showAsAction指定按钮的显示位置
+        always：永远显示在toolbar，屏幕空间不够就不显示
+        ifRoom：屏幕空间足够就显示在toolbar，不够就显示在菜单中
+        never：永远显示在菜单中
+        ！！：toolbar中的action按钮只会显示图标，菜单中的则只会显示文字-->
+</menu>

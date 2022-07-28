@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    android:background="@drawable/pic_above1">
+
+    <!--圆形图片-->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/loggedUserHeadPortrait"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@mipmap/ic_launcher"
+        app:shapeAppearanceOverlay="@style/circleImageStyle" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@+id/loggedUserHeadPortrait"
+        android:id="@+id/userNameTextLayout">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:textColor="@color/white"
+            android:text="用户昵称：" />
+
+        <TextView
+            android:id="@+id/userNameText"
+            android:textStyle="italic"
+            android:textColor="@color/white"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@+id/userNameTextLayout"
+        android:id="@+id/userAccountTextLayout">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:textColor="@color/white"
+            android:text="用户账号：" />
+
+        <TextView
+            android:id="@+id/userAccountText"
+            android:textStyle="italic"
+            android:textColor="@color/white"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/logOutBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorPrimary"
+        android:backgroundTintMode="src_over"
+        android:layout_below="@id/userAccountTextLayout"
+        android:text="注销" />
+
+</RelativeLayout>

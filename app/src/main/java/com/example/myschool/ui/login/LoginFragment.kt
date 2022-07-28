@@ -182,7 +182,7 @@ class LoginFragment : Fragment() {
         thread {
             val loggedUsers: List<User> = userDao.loadLoggedUsers(true)
             if (loggedUsers.isNotEmpty()) {
-                val adapter = AccountAdapter(activity, R.layout.account_item, loggedUsers)
+                val adapter = AccountAdapter(activity, R.layout.item_account, loggedUsers)
                 listView.adapter = adapter
                 listView.onItemClickListener =
                     OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->

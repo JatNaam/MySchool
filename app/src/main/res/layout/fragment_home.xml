@@ -47,8 +47,9 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/blue"
             android:gravity="center"
+            android:textColor="@color/black"
             android:text="点击进入公文通"
-            android:layout_marginLeft="40dp"/>
+            android:layout_marginStart="40dp"/>
     </LinearLayout>
 
     <View
@@ -66,7 +67,17 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <TextClock
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:format24Hour ="yyyy年MM月dd日 EEEE"
+        android:format12Hour ="yyyy年MM月dd日 EEEE"
+        android:textColor="@color/white"
+        android:gravity="center"/>
 
 </LinearLayout>
 

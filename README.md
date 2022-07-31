@@ -1,1 +1,26 @@
 # MySchool
+实现了注册登录的功能：
+首先利用Room数据库存储用户数据；
+再对账号栏进行监听实现根据账号是否记住密码的状态来决定是否自动填充密码；
+利用SharedPreferences实现重新打开程序可以保留上一次关闭前登录的账号；
+登录之后的会记录到登录界面popupWindow中实现下拉选择账号登录
+在注册账号时的头像选择可以进行拍照或是从相册选择：
+点击头像选项会在底部弹出一个选择拍照或是相册的弹窗，
+因为Android7.0以后读取文件需要配置Provider，
+所以拍照功能用到了ContentProvider来实现存储，相册选择则是直接文件读取，
+这里的难点在于路径的获取，因为数据库无法存储图片的格式，所以我们要存储图片的路径的String进去；
+
+实现掉线和注销功能：
+利用网络监听结合广播来实现；
+在所有活动的父类BaseActivity实现并注册强制下线广播，实现了注销账号返回登录界面功能
+只有连上网才能登录成功，在登录之后进去的MainActivity中注册一个广播来实现动态监听网络状态，
+断开网络会弹出窗口提示然后跳回登录界面
+
+登录进去的界面实现：
+主要分为三个fragment：主页、师生事务、生活服务
+手机模式则每个fragment各自嵌套在一个activity中进行活动跳转
+（利用在DrawerLayout的Menu按钮进行跳转，注销按钮和用户信息在DrawerLayout的NavigationView）
+平板模式则是直接三个fragment一起显示；
+主页利用TabLayout+ViewPager2实现滑动显示通知，ViewPager2中的fragment仅有一个RecycleView；
+另外两个都是fragment仅有一个RecycleView；
+底部则是利用TextClock实现时间显示；

@@ -83,13 +83,7 @@ class RegisterFragment : Fragment() {
         }
 
         binding.userHeadPortraitSetter.setOnClickListener {
-            if (binding.registerAccountEdit.text.isNotEmpty())
-                setHeadPortrait()
-            else
-                Toast.makeText(
-                    MySchoolApplication.context, "Please input your account!",
-                    Toast.LENGTH_SHORT
-                ).show()
+            setHeadPortrait()
         }
 
         binding.confirmBtn.setOnClickListener {

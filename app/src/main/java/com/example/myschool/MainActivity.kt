@@ -6,10 +6,9 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
 import com.example.myschool.databinding.ActivityMainBinding
-import com.example.myschool.logic.model.User
+import com.example.myschool.database.entity.User
 import com.example.myschool.network.NetWorkStatusChangerReceiver
 import com.example.myschool.ui.function.LifeActivity
 import com.example.myschool.ui.function.StudyActivity
@@ -27,10 +26,11 @@ class MainActivity : BaseActivity() {
 
         val user = intent?.getSerializableExtra("userData") as User
 
-        val loggedUserHeadPortrait = binding.navView.getHeaderView(0)
-            .findViewById<ShapeableImageView>(R.id.loggedUserHeadPortrait)
-        loggedUserHeadPortrait.let {
-            Glide.with(this).load(user.userHeadPortraitPath)
+        // 头像
+        val loggedAvatar = binding.navView.getHeaderView(0)
+            .findViewById<ShapeableImageView>(R.id.loggedAvatar)
+        loggedAvatar.let {
+            Glide.with(this).load(user.avatar)
                 .apply(MySchoolApplication.requestOptions)
                 .into(it)
         }
@@ -43,19 +43,19 @@ class MainActivity : BaseActivity() {
 
         val logOutBtn =
             binding.navView.getHeaderView(0).findViewById<Button>(R.id.logOutBtn)
-        logOutBtn.setOnClickListener{
+        logOutBtn.setOnClickListener {
             intent = Intent("com.example.myschool.Force_Offline")
             sendBroadcast(intent) // 发送强制下线广播
         }
 
-        if (binding.tabletLayout==null){
+        if (binding.tabletLayout == null) {
             binding.navView.setNavigationItemSelectedListener { //设置滑动菜单中item的点击事件，这里调用了将滑动菜单关闭的方法
                 when (it.itemId) {
-                    R.id.navStudy ->{
+                    R.id.navStudy -> {
                         val intent = Intent(this, StudyActivity::class.java)
                         startActivity(intent)
                     }
-                    R.id.navLife ->{
+                    R.id.navLife -> {
                         val intent = Intent(this, LifeActivity::class.java)
                         startActivity(intent)
                     }
@@ -66,7 +66,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun openDrawerLayout(){
+    fun openDrawerLayout() {
         binding.drawerLayout.open()
     }
 
@@ -80,6 +80,7 @@ class MainActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         if (receiver != null) {
+            // 注销广播接收器
             unregisterReceiver(receiver)
             receiver = null
         }

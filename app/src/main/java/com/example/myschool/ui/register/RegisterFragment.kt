@@ -29,8 +29,9 @@ import com.bumptech.glide.Glide
 import com.example.myschool.MySchoolApplication
 import com.example.myschool.R
 import com.example.myschool.databinding.FragmentRegisterBinding
-import com.example.myschool.logic.AppDatabase
-import com.example.myschool.logic.model.User
+import com.example.myschool.database.AppDatabase
+import com.example.myschool.database.entity.User
+import com.example.myschool.network.NetWorkUtil
 import com.example.myschool.ui.login.LoginActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.io.File
@@ -45,10 +46,10 @@ class RegisterFragment : Fragment() {
 
     private val takePhoto = 1
     private val fromAlbum = 2
-    private lateinit var headPortraitUri: Uri
-    private lateinit var headPortrait: File
-    private lateinit var headPortraitPath: String
-    private var isGetHeadPortraitPath:Boolean=false
+    private lateinit var avatarUri: Uri
+    private lateinit var avatarFile: File
+    private lateinit var avatar: String
+    private var isSetAvatar: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,51 +57,58 @@ class RegisterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
-
         val activity = activity
-
+        // 获取数据库的Dao对象
         val userDao = AppDatabase.getDatabase(MySchoolApplication.context).getUserDao()
-
+        // 表单验证
         binding.registerAccountEdit.addTextChangedListener { editable ->
             val content = editable.toString()
             if (content.length !in 6..10) {
                 binding.registerAccountEdit.error = "输入不可小于6位且不可超出10位"
             }
         }
-
         binding.registerPasswordEdit.addTextChangedListener { editable ->
             val content = editable.toString()
             if (content.length !in 8..15) {
                 binding.registerPasswordEdit.error = "输入不可小于8位且不可超出15位"
             }
         }
-
         binding.registerNameEdit.addTextChangedListener { editable ->
             val content = editable.toString()
             if (content.isEmpty()) {
                 binding.registerNameEdit.error = "用户名不可为空"
             }
         }
-
-        binding.userHeadPortraitSetter.setOnClickListener {
-            setHeadPortrait()
+        binding.avatar.setOnClickListener {
+            setAvatar()
         }
-
         binding.confirmBtn.setOnClickListener {
-            val account:String = binding.registerAccountEdit.text.toString()
+            val account: String = binding.registerAccountEdit.text.toString()
             val password: String = binding.registerPasswordEdit.text.toString()
             val userName: String = binding.registerNameEdit.text.toString()
-            if (account.length in 6..10 && password.length in 8..15 && userName.isNotEmpty()&&isGetHeadPortraitPath) {
+            if (account.length in 6..10 && password.length in 8..15 && userName.isNotEmpty() && isSetAvatar) {
+                // 网络验证
+                if (!NetWorkUtil.isNetworkConnected(MySchoolApplication.context))
+                    Toast.makeText(
+                        MySchoolApplication.context, "Please check your network status!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                /**
+                 * 数据库操作必须要在子线程进行
+                 */
                 thread {
+                    // 查询该账号是否已被占用
                     val user: User? = userDao.loadUser(account)
                     if (user == null) {
                         val newUser = User(
                             account, password, userName,
-                            userStatus = true,
+                            isChecked = true,
                             isLogged = false,
-                            headPortraitPath
+                            avatar
                         )
+                        // 插入成功会返回id
                         newUser.id = userDao.insertUser(newUser)
+                        // 注册成功，跳转回登录界面
                         val intent = Intent(context, LoginActivity::class.java).apply {
                             putExtra("registerAccount", account)
                             putExtra("STATUS", "REGISTER")
@@ -125,9 +133,12 @@ class RegisterFragment : Fragment() {
         return binding.root
     }
 
-    /*更换头像*/
+    /**
+     * 更换头像
+     * */
     @SuppressLint("InflateParams")
-    private fun setHeadPortrait() {
+    private fun setAvatar() {
+        // 弹窗
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         val dialogView = layoutInflater.inflate(R.layout.dialog_bottom_register, null)
         bottomSheetDialog.setContentView(dialogView)
@@ -138,66 +149,65 @@ class RegisterFragment : Fragment() {
         val tvTakePictures: TextView = dialogView.findViewById(R.id.tv_take_pictures)
         val tvOpenAlbum: TextView = dialogView.findViewById(R.id.tv_open_album)
         val tvCancel: TextView = dialogView.findViewById(R.id.tv_cancel)
-
-        //拍照
+        // 弹出弹窗的同时绑定点击事件，拍照
         tvTakePictures.setOnClickListener {
             takePhoto()
-            bottomSheetDialog.cancel()
+            bottomSheetDialog.cancel() // 点击后关闭弹窗
         }
-        //打开相册
+        // 打开相册
         tvOpenAlbum.setOnClickListener {
+            // 判断是否有读写权限
             if (ContextCompat.checkSelfPermission(
                     requireContext(),
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                //动态申请读写SD卡的权限
+                // Android6（API23）开始，读写SD卡在AndroidManifest.xml声明之后，还需动态申请权限
                 ActivityCompat.requestPermissions(
                     requireActivity(),
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     1
                 )
-            } else {
-                openAlbum()
-            }
+            } else openAlbum()
             bottomSheetDialog.cancel()
         }
-        //取消
+        // 取消
         tvCancel.setOnClickListener { bottomSheetDialog.cancel() }
-        //底部弹窗显示
+        // 弹出弹窗
         bottomSheetDialog.show()
     }
 
-    /*拍照*/
+    /**
+     * 拍照
+     * */
     @SuppressLint("SimpleDateFormat")
     private fun takePhoto() {
         // 创建File对象，用于存储拍照后的图片
-        val timeStampFormat = SimpleDateFormat(
-            "yyyy_MM_dd_HH_mm_ss"
-        )
+        val timeStampFormat = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss")
         val filename = timeStampFormat.format(Date())
-        headPortrait = File(requireContext().externalCacheDir, filename + "headPortraits.jpg")
-        if (headPortrait.exists()) {
-            headPortrait.delete()
-        }
-        headPortrait.createNewFile()
-        headPortraitUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            FileProvider.getUriForFile(
-                requireContext(),
-                "com.example.myschool.fileprovider",
-                headPortrait
-            )
-        } else {
-            Uri.fromFile(headPortrait)
-        }
+        avatarFile = File(requireContext().externalCacheDir, filename + "_avatar.jpg")
+        if (avatarFile.exists()) // 如果该文件存在，则删除后再创建新文件
+            avatarFile.delete()
+        avatarFile.createNewFile()
+        // Android7.0以后读写文件需要配置Provider
+        avatarUri =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                FileProvider.getUriForFile(
+                    requireContext(),
+                    "com.example.myschool.fileprovider",
+                    avatarFile
+                )
+            else Uri.fromFile(avatarFile)
         // 启动相机程序
         val intent = Intent("android.media.action.IMAGE_CAPTURE")
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, headPortraitUri)
-        headPortraitPath = headPortrait.absolutePath
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, avatarUri)
+        avatar = avatarFile.absolutePath
         startActivityForResult(intent, takePhoto)
     }
 
-    /*打开相册*/
+    /**
+     * 打开相册
+     * */
     private fun openAlbum() {
         // 打开文件选择器
         val intent = Intent("android.intent.action.GET_CONTENT")
@@ -213,23 +223,23 @@ class RegisterFragment : Fragment() {
             takePhoto -> {
                 if (resultCode == Activity.RESULT_OK) {
                     // 将拍摄的照片显示出来
-                    displayImage(headPortraitPath)
+                    displayImage(avatar)
                 }
             }
             fromAlbum -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
-                    getHeadPortraitPath(data)
+                    getAvatarPath(data) // 方法内部有调用到displayImage方法
                 }
             }
         }
     }
 
-    private fun getHeadPortraitPath(data: Intent) {
+    private fun getAvatarPath(data: Intent) {
         var imagePath: String? = null
         val uri = data.data
         Log.d("TAG", "handleImageOnKitKat: uri is $uri")
+        // 如果是document类型的Uri，则通过document id处理
         if (DocumentsContract.isDocumentUri(requireContext(), uri)) {
-            // 如果是document类型的Uri，则通过document id处理
             val docId = DocumentsContract.getDocumentId(uri)
             if ("com.android.providers.media.documents" == uri!!.authority) {
                 val id = docId.split(":").toTypedArray()[1] // 解析出数字格式的id
@@ -242,14 +252,14 @@ class RegisterFragment : Fragment() {
                 )
                 imagePath = getImagePath(contentUri, null)
             }
-        } else if ("content".equals(uri!!.scheme, ignoreCase = true)) {
-            // 如果是content类型的Uri，则使用普通方式处理
-            imagePath = getImagePath(uri, null)
-        } else if ("file".equals(uri.scheme, ignoreCase = true)) {
-            // 如果是file类型的Uri，直接获取图片路径即可
-            imagePath = uri.path
         }
-        headPortraitPath = imagePath ?: null.toString()
+        // 如果是content类型的Uri，则使用普通方式处理
+        else if ("content".equals(uri!!.scheme, ignoreCase = true))
+            imagePath = getImagePath(uri, null)
+        // 如果是file类型的Uri，直接获取图片路径即可
+        else if ("file".equals(uri.scheme, ignoreCase = true))
+            imagePath = uri.path
+        avatar = imagePath ?: null.toString()
         displayImage(imagePath)
     }
 
@@ -260,41 +270,43 @@ class RegisterFragment : Fragment() {
         val cursor: Cursor? =
             requireContext().contentResolver.query(uri, null, selection, null, null)
         if (cursor != null) {
-            if (cursor.moveToFirst()) {
+            if (cursor.moveToFirst())
                 path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
-            }
             cursor.close()
         }
         return path
     }
 
-    /*动态申请权限时会回调到该方法
-    * 该方法要在Fragment的Activity也重写之后，
-    * */
+    /**
+     * 动态申请权限时会回调到该方法
+     * 该方法要在Fragment挂载的Activity中也重写，
+     * */
     @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openAlbum()
-            } else {
-                Toast.makeText(
-                    MySchoolApplication.context, "You denied the permission!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
+        if (requestCode == 1)
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                openAlbum() // 同意授权后，直接打开相册
+            else Toast.makeText(
+                MySchoolApplication.context, "You denied the permission!",
+                Toast.LENGTH_SHORT
+            ).show()
     }
 
-    /*通过图片路径显示图片*/
+    /**
+     * 通过图片路径显示图片
+     * */
     private fun displayImage(imagePath: String?) {
         if (!TextUtils.isEmpty(imagePath)) {
             //显示图片
             Glide.with(this).load(imagePath).apply(MySchoolApplication.requestOptions)
-                .into(binding.userHeadPortraitSetter)
-            isGetHeadPortraitPath=true
-        }
-        else
+                .into(binding.avatar)
+            isSetAvatar = true
+        } else
             Toast.makeText(
                 MySchoolApplication.context, "Failed to get image!",
                 Toast.LENGTH_SHORT

@@ -1,25 +1,21 @@
-package com.example.myschool.logic.dao
+package com.example.myschool.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.myschool.logic.model.User
+import com.example.myschool.database.entity.User
 
-/*使用该注解，Room数据库才能把该接口识别成一个Dao*/
-@Dao
+/**
+ * 除@Query注解要编写SQL语句外，其他操作均只要添加注解即可
+ */
+@Dao // 使用该注解，Room数据库才能把该接口识别成一个Dao
 interface UserDao {
-    /*
-    除@Query注解要编写SQL语句外，其他操作均只要添加注解即可
-    */
-/*
-除@Query注解要编写SQL语句外，其他操作均只要添加注解即可
-*/
     @Insert
     fun insertUser(user: User): Long
 
     @Update
-    fun updateUser(newUser: User)
+    fun updateUser(user: User)
 
     @Query("select * from User")
     fun loadAllUsers(): List<User>
@@ -32,5 +28,4 @@ interface UserDao {
 
     @Query("delete from User where userAccount = :userAccount")
     fun deleteUserByAccount(userAccount: String): Int
-
 }

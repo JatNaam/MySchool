@@ -17,9 +17,9 @@ import com.example.myschool.MainActivity
 import com.example.myschool.MySchoolApplication
 import com.example.myschool.R
 import com.example.myschool.databinding.FragmentLoginBinding
-import com.example.myschool.logic.AppDatabase
-import com.example.myschool.logic.dao.UserDao
-import com.example.myschool.logic.model.User
+import com.example.myschool.database.AppDatabase
+import com.example.myschool.database.dao.UserDao
+import com.example.myschool.database.entity.User
 import com.example.myschool.network.NetWorkUtil
 import com.example.myschool.ui.register.RegisterActivity
 import kotlin.concurrent.thread
@@ -48,17 +48,19 @@ class LoginFragment : Fragment() {
         binding.loginAccountEdit.addTextChangedListener { editable ->
             val content = editable.toString()
             if (content.isNotEmpty()) {
+                // 开启子线程查询数据库
                 thread {
                     val user: User? = userDao.loadUser(content)
                     if (user != null) {
                         activity?.runOnUiThread {
-                            Glide.with(this).load(user.userHeadPortraitPath)
+                            Glide.with(this).load(user.avatar)
                                 .apply(MySchoolApplication.requestOptions)
-                                .into(binding.userHeadPortrait)
-                            binding.rememberCheck.isChecked = user.userStatus
-                            if (user.userStatus) {
+                                .into(binding.userAvatar)
+                            // 如果用户记住密码则勾上CheckBox并自动填充密码，否则。。。
+                            binding.rememberCheck.isChecked = user.isChecked
+                            if (user.isChecked)
                                 binding.loginPasswordEdit.setText(user.userPassword)
-                            } else binding.loginPasswordEdit.text = null
+                            else binding.loginPasswordEdit.text = null
                         }
                     }
                 }
@@ -74,17 +76,19 @@ class LoginFragment : Fragment() {
             }
         }
 
-        /*判断是在什么情况打开登录界面的*/
+        /**
+         * 判断是在什么情况打开登录界面的
+         * */
         var intent = activity?.intent
         if (intent != null) {
             when (intent.getStringExtra("STATUS")) {
                 null -> {
-                    /*重新打开程序、填上上一个登录的账号*/
+                    // 重新打开程序（包括断网掉线和注销登录）、填上上一个登录的账号
                     val loggedAccountBefore: String? = sp.getString("loggedAccountBefore", null)
                     binding.loginAccountEdit.setText(loggedAccountBefore)
                 }
                 "REGISTER" -> {
-                    //填上刚刚注册完成的账号
+                    // 填上刚刚注册完成的账号
                     val registerAccount = intent.getStringExtra("registerAccount")
                     binding.loginAccountEdit.setText(registerAccount)
                 }
@@ -94,21 +98,21 @@ class LoginFragment : Fragment() {
         binding.loginBtn.setOnClickListener {
             val account: String = binding.loginAccountEdit.text.toString()
             val password: String = binding.loginPasswordEdit.text.toString()
-            if (NetWorkUtil.isNetworkConnected(MySchoolApplication.context)){
+            if (NetWorkUtil.isNetworkConnected(MySchoolApplication.context)) {
                 if (account.length in 6..10 && password.length in 8..15) {
                     thread {
                         val user: User? = userDao.loadUser(account)
                         if (user != null) {
                             if (user.userPassword == password) {
-                                user.userStatus = binding.rememberCheck.isChecked
+                                user.isChecked = binding.rememberCheck.isChecked
                                 user.isLogged = true
                                 userDao.updateUser(user)
                                 /*利用intent传递序列化之后的对象数据*/
                                 intent = Intent(context, MainActivity::class.java).apply {
                                     putExtra("userData", user)
                                 }
-                                /*保存登录的账号，用于重新打开程序时填写信息*/
-                                /*重新更新users的数据*/
+                                // 保存登录的账号，用于重新打开程序时填写信息
+                                // 重新更新users的数据
                                 @SuppressLint("CommitPrefEdits") val editor = sp.edit()
                                 editor.putString("loggedAccountBefore", account)
                                 editor.apply()
@@ -150,7 +154,7 @@ class LoginFragment : Fragment() {
         }
 
         binding.registerBtn.setOnClickListener {
-            if (NetWorkUtil.isNetworkConnected(MySchoolApplication.context)){
+            if (NetWorkUtil.isNetworkConnected(MySchoolApplication.context)) {
                 intent = Intent(context, RegisterActivity::class.java)
                 startActivity(intent)
                 activity?.finish()
@@ -176,10 +180,11 @@ class LoginFragment : Fragment() {
             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true
         )
         mPopWindow.contentView = contentView
-
-        //实现PopupWindow+ListView切换账户
+        // 实现PopupWindow+ListView切换账户
         val listView = contentView.findViewById<View>(R.id.accountList) as ListView
+        // 数据库操作必须在子线程
         thread {
+            // 查询登录过的用户
             val loggedUsers: List<User> = userDao.loadLoggedUsers(true)
             if (loggedUsers.isNotEmpty()) {
                 val adapter = AccountAdapter(activity, R.layout.item_account, loggedUsers)
@@ -188,13 +193,12 @@ class LoginFragment : Fragment() {
                     OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
                         activity?.runOnUiThread {
                             binding.loginAccountEdit.setText(loggedUsers[position].userAccount)
-                            /*关闭PopupWindow*/
-                            mPopWindow.dismiss()
+                            mPopWindow.dismiss() // 选择后关闭下拉列表
                         }
                     }
             }
         }
-        //显示PopupWindow
+        // 在下拉按钮下方显示PopupWindow
         mPopWindow.showAsDropDown(binding.showListBtn)
     }
 
@@ -216,9 +220,8 @@ class LoginFragment : Fragment() {
                 view = convertView
                 viewHolder = view.tag as ViewHolder // 重新获取ViewHolder
             }
-            if (accountItem != null) {
+            if (accountItem != null)
                 viewHolder.account.text = accountItem.userAccount
-            }
             return view
         }
 

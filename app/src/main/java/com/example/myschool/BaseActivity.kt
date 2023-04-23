@@ -16,33 +16,36 @@ open class BaseActivity : AppCompatActivity() {
     private var receiver: ForceOfflineReceiver? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addActivity(this)
+        addActivity(this) // 调用ActivityCollector的addActivity方法
     }
 
     override fun onResume() {
         super.onResume()
         val intentFilter = IntentFilter()
         intentFilter.addAction("com.example.myschool.Force_Offline")
-        receiver = ForceOfflineReceiver() //创建广播接受器对象
-        registerReceiver(receiver, intentFilter) //动态注册广播接收器
+        receiver = ForceOfflineReceiver() // 创建广播接受器对象
+        registerReceiver(receiver, intentFilter) // 动态注册广播接收器
     }
 
     override fun onPause() {
         super.onPause()
         if (receiver != null) {
-            unregisterReceiver(receiver)
+            unregisterReceiver(receiver) //注销广播接收器
             receiver = null
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        removeActivity(this)
+        removeActivity(this) // 调用ActivityCollector的removeActivity方法
     }
 
+    // 继承广播接受器类
     inner class ForceOfflineReceiver : BroadcastReceiver() {
-        //继承广播接受器类
-        override fun onReceive(context: Context, intent: Intent) { //这个intent接受广播传输的数据
+        /**
+         * @param intent 接受广播传输的数据
+         */
+        override fun onReceive(context: Context, intent: Intent) {
             AlertDialog.Builder(context).apply {
                 setTitle("Warning")
                 setMessage("Log out.")

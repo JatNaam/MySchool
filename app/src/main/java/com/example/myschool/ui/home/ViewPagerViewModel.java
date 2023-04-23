@@ -12,17 +12,22 @@ import androidx.lifecycle.ViewModel;
 public class ViewPagerViewModel extends ViewModel {
 
     private MutableLiveData<Integer> mIndex = new MutableLiveData<>();
+
+    /**
+     * 第一个参数是mIndex，map会对它进行观察；当mIndex发生变化，就会调用这里的转换函数
+     * 第二参数是转换函数，map方法可以将第一个LiveData参数自由转换成任意类型的LiveData
+     * Activity或Fragment只要观察这个LiveData对象index就行了
+     */
     private LiveData<Integer> index = Transformations.map(mIndex, new Function<Integer, Integer>() {
-    /*第一个参数是mIndex，map会对它进行观察；当mIndex发生变化，就会调用这里的转换函数
-    * 第二参数是转换函数，map方法可以将第一个LiveData参数自由转换成任意类型的LiveData
-    * Activity或Fragment只要观察这个LiveData对象index就行了*/
         @Override
         public Integer apply(Integer i) {
             return i;
         }
     });
 
-    /*调用这个方法就会导致mIndex被观察到变化*/
+    /**
+     * 调用这个方法就会导致mIndex被观察到变化*
+     */
     public void setIndex(int index) {
         mIndex.setValue(index);
     }

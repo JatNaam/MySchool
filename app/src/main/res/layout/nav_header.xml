@@ -8,7 +8,7 @@
 
     <!--圆形图片-->
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/loggedUserHeadPortrait"
+        android:id="@+id/loggedAvatar"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:src="@mipmap/ic_launcher"
@@ -18,7 +18,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_below="@+id/loggedUserHeadPortrait"
+        android:layout_below="@+id/loggedAvatar"
         android:id="@+id/userNameTextLayout">
         <TextView
             android:layout_width="wrap_content"

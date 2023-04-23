@@ -8,10 +8,10 @@ import com.example.myschool.ActivityCollector
 import com.example.myschool.MySchoolApplication
 import com.example.myschool.ui.login.LoginActivity
 
+//继承广播接受器类
 class NetWorkStatusChangerReceiver : BroadcastReceiver() {
-    //继承广播接受器类
-    override fun onReceive(context: Context, intent: Intent) { //这个intent接受广播传输的数据
-        if (!NetWorkUtil.isNetworkConnected(MySchoolApplication.context)){
+    override fun onReceive(context: Context, intent: Intent) {
+        if (!NetWorkUtil.isNetworkConnected(MySchoolApplication.context)) {
             AlertDialog.Builder(context).apply {
                 setTitle("Warning")
                 setMessage("Network connection down. Please try to login again.")

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -19,25 +20,28 @@
             android:name="com.example.myschool.ui.home.HomeFragment"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_home" />
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/study_fragment"
             android:name="com.example.myschool.ui.function.StudyFragment"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_study" />
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/life_fragment"
             android:name="com.example.myschool.ui.function.LifeFragment"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_life" />
     </LinearLayout>
 
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"/>
